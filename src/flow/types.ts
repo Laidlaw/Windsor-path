@@ -18,6 +18,7 @@ export interface FlowOption {
   adds_complexity?: number;
   sets?: Record<string, string>;
   explanation?: string;
+  weight?: number; // optional probability weight for future prediction/ranking
 }
 
 export interface LearnMore {

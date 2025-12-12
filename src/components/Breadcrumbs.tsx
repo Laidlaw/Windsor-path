@@ -18,6 +18,7 @@ export function Breadcrumbs() {
 
   return (
     <div className="wp-crumbs">
+      <div className="wp-crumbs__lead">Revise:</div>
       {crumbs.map((crumb) => (
         <button
           type="button"
@@ -29,7 +30,6 @@ export function Breadcrumbs() {
           <span className="wp-crumb__value">{crumb.value}</span>
         </button>
       ))}
-      <div className="wp-crumbs__hint">Revise any earlier detail</div>
     </div>
   );
 }

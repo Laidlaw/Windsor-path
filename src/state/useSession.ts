@@ -47,6 +47,12 @@ type MoveOpts = {
   justEdited?: boolean;
 };
 
+const stripScenario = (sets?: Record<string, string>) => {
+  if (!sets) return undefined;
+  const entries = Object.entries(sets).filter(([key]) => key !== "scenario");
+  return entries.length ? Object.fromEntries(entries) : undefined;
+};
+
 const navigateToNode = (
   targetId: string,
   set: (fn: (state: SessionState) => SessionState) => void,
@@ -126,8 +132,9 @@ export const useSession = create<SessionState>((set, get) => ({
     if (!option || !option.next) return;
 
     set((state) => {
-      const merged = option.sets
-        ? { ...state.answers, [nodeId]: value, ...option.sets }
+      const cleanedSets = stripScenario(option.sets);
+      const merged = cleanedSets
+        ? { ...state.answers, [nodeId]: value, ...cleanedSets }
         : { ...state.answers, [nodeId]: value };
 
       return {
@@ -160,8 +167,9 @@ export const useSession = create<SessionState>((set, get) => ({
     if (!option || !option.next) return;
 
     set((state) => {
-      const merged = option.sets
-        ? { ...state.answers, [nodeId]: value, ...option.sets }
+      const cleanedSets = stripScenario(option.sets);
+      const merged = cleanedSets
+        ? { ...state.answers, [nodeId]: value, ...cleanedSets }
         : { ...state.answers, [nodeId]: value };
       return {
         ...state,
@@ -189,9 +197,8 @@ export const useSession = create<SessionState>((set, get) => ({
   },
   advanceFromVerdict: (assessment) => {
     set((state) => {
-      const merged = assessment.sets
-        ? { ...state.answers, ...assessment.sets }
-        : state.answers;
+      const cleanedSets = stripScenario(assessment.sets);
+      const merged = cleanedSets ? { ...state.answers, ...cleanedSets } : state.answers;
       return {
         ...state,
         answers: merged,
@@ -216,8 +223,16 @@ export const useSession = create<SessionState>((set, get) => ({
         delete answers[id];
       });
 
+      const movementChoice = answers["movement_type"];
+      const movementRemoved =
+        "movement_type" in state.answers && movementChoice === undefined;
+
       const nextScenario =
-        typeof answers.scenario === "string" ? (answers.scenario as string) : null;
+        typeof movementChoice === "string"
+          ? movementChoice
+          : movementRemoved || nodeId === "movement_type"
+          ? null
+          : state.scenario;
 
       return {
         ...state,

@@ -22,7 +22,6 @@ const priorityCopy: Record<string, string> = {
 
 export function ResultView({ node, entryTone }: Props) {
   const goBack = useSession((s) => s.goBackFromResult);
-  const reset = useSession((s) => s.reset);
 
   return (
     <div className="wp-card">
@@ -136,12 +135,9 @@ export function ResultView({ node, entryTone }: Props) {
         </section>
       )}
 
-      <div className="wp-actions">
+      <div className="wp-actions solo">
         <button type="button" className="wp-secondary" onClick={goBack}>
           Revise an earlier answer
-        </button>
-        <button type="button" className="wp-primary" onClick={reset}>
-          Start over
         </button>
       </div>
     </div>

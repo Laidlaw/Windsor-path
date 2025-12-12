@@ -8,6 +8,7 @@ import type {
   VerdictAssessment,
   VerdictNode,
 } from "./types";
+import { getOutgoing, predictNext } from "./graph";
 
 export const MAX_COMPLEXITY = 15;
 
@@ -134,6 +135,10 @@ export function safeNextFromOption(
   const option = node.options.find((opt) => opt.value === value);
   return option?.next ?? null;
 }
+
+// Graph helpers expose edges without coupling callers to flowData.
+export const getEdgesFromNode = getOutgoing;
+export const predictNextEdge = predictNext;
 
 export function mergeSets(
   base: Record<string, unknown>,

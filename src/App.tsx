@@ -1,9 +1,8 @@
 import { useEffect } from "react";
-import { Breadcrumbs } from "./components/Breadcrumbs";
-import { ComplexityMeter } from "./components/ComplexityMeter";
 import { EntryTabs } from "./components/EntryTabs";
 import { NodeRenderer } from "./components/NodeRenderer";
 import { SummaryPanel } from "./components/SummaryPanel";
+import { Breadcrumbs } from "./components/Breadcrumbs";
 import { useSession } from "./state/useSession";
 import "./styles.css";
 
@@ -11,36 +10,36 @@ export default function WindsorPathApp() {
   const start = useSession((s) => s.start);
   const currentNodeId = useSession((s) => s.currentNodeId);
   const getNode = useSession((s) => s.getNode);
-  const complexity = useSession((s) => s.complexity);
-  const scenario = useSession((s) => s.scenario);
-  const answers = useSession((s) => s.answers);
+  const reset = useSession((s) => s.reset);
 
   useEffect(() => {
     start();
   }, [start]);
 
   const node = getNode(currentNodeId);
-  const scenarioChosen = Boolean(scenario || answers.scenario);
-
   return (
     <div className="wp-shell">
       <header className="wp-hero">
         <div>
-          <div className="wp-kicker">Guidance without the PDF maze</div>
+          {/* <div className="wp-kicker">Guidance without the PDF maze</div> */}
           <h1>Windsor Framework Pathfinder</h1>
-          <p className="wp-subtitle">
+          {/* <p className="wp-subtitle">
             Figure out what applies to your goods in a short, answer-first conversation.
-          </p>
+          </p> */}
         </div>
       </header>
 
-      <ComplexityMeter complexity={complexity} scenarioChosen={scenarioChosen} />
       <EntryTabs />
 
       <div className="wp-layout">
         <div className="wp-main">
-          <Breadcrumbs />
           <NodeRenderer node={node} />
+          <Breadcrumbs />
+          <div className="wp-inline-actions">
+            <button className="wp-link ghost" type="button" onClick={() => reset()}>
+              Start over
+            </button>
+          </div>
         </div>
         <SummaryPanel />
       </div>
