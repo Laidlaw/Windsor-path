@@ -101,7 +101,11 @@ export function evaluateVerdict(
   const helperNode = helperNodeId
     ? (flowData.nodes[helperNodeId] as HelperNode | undefined)
     : undefined;
-  const analysis = helperNode?.followup.analysis;
+  const analysis = helperNode?.followup?.analysis;
+
+  if (!analysis) {
+    return node.assessment.if_not_category1;
+  }
 
   const lower = userInput.toLowerCase();
   const triggers = analysis?.possibly_category1 ?? [];

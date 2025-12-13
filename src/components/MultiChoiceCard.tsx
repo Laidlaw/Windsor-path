@@ -17,9 +17,18 @@ export function MultiChoiceCard({ node, showEditWarning }: Props) {
   }, [existing]);
 
   const toggle = (value: string) => {
-    setSelected((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
-    );
+    setSelected((prev) => {
+      if (value === "none") {
+        // "None" is exclusive: select only it, or deselect if already chosen.
+        return prev.includes("none") ? [] : ["none"];
+      }
+
+      // If picking any other option, drop "none" from the selection.
+      const withoutNone = prev.filter((v) => v !== "none");
+      return withoutNone.includes(value)
+        ? withoutNone.filter((v) => v !== value)
+        : [...withoutNone, value];
+    });
   };
 
   return (

@@ -23,7 +23,7 @@ export const flowData: FlowData = {
               "movement_type": {
                 "id": "movement_type",
                 "tier": "movement",
-                "question": "Which best describes this movement of goods?",
+                "question": "Let's start at the beginning and the end.",
                 "type": "single_choice",
                 "help": "Think about the physical journey the goods are making — not paperwork or customers yet.",
                 "complexity": 0,

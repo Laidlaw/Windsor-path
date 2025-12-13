@@ -1,47 +1,46 @@
-import { useEffect } from "react";
-import { EntryTabs } from "./components/EntryTabs";
-import { NodeRenderer } from "./components/NodeRenderer";
+import { useEffect, useState } from "react";
+import { FlowStack } from "./components/FlowStack";
 import { SummaryPanel } from "./components/SummaryPanel";
-import { Breadcrumbs } from "./components/Breadcrumbs";
 import { useSession } from "./state/useSession";
 import "./styles.css";
 
 export default function WindsorPathApp() {
   const start = useSession((s) => s.start);
-  const currentNodeId = useSession((s) => s.currentNodeId);
-  const getNode = useSession((s) => s.getNode);
   const reset = useSession((s) => s.reset);
+  const [reportOpen, setReportOpen] = useState(false);
 
   useEffect(() => {
     start();
   }, [start]);
 
-  const node = getNode(currentNodeId);
   return (
     <div className="wp-shell">
-      <header className="wp-hero">
-        <div>
-          {/* <div className="wp-kicker">Guidance without the PDF maze</div> */}
-          <h1>Windsor Framework Pathfinder</h1>
-          {/* <p className="wp-subtitle">
-            Figure out what applies to your goods in a short, answer-first conversation.
-          </p> */}
-        </div>
+      <header className="wp-topbar">
+        <button className="wp-brand" type="button" onClick={() => reset()}>
+          Windsor Path
+        </button>
+        <button className="wp-restart hide-mobile" type="button" onClick={() => reset()}>
+          Restart
+        </button>
+        <button
+          className="wp-menu-toggle"
+          type="button"
+          onClick={() => setReportOpen((open) => !open)}
+          aria-label="Open menu"
+        >
+          Menu
+        </button>
       </header>
-
-      <EntryTabs />
 
       <div className="wp-layout">
         <div className="wp-main">
-          <NodeRenderer node={node} />
-          <Breadcrumbs />
-          <div className="wp-inline-actions">
-            <button className="wp-link ghost" type="button" onClick={() => reset()}>
-              Start over
-            </button>
-          </div>
+          <FlowStack />
         </div>
-        <SummaryPanel />
+        <SummaryPanel
+          reportOpen={reportOpen}
+          onCloseReport={() => setReportOpen(false)}
+          onRestart={() => reset()}
+        />
       </div>
 
       <footer className="wp-disclaimer">

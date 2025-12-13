@@ -26,6 +26,7 @@ type SessionState = {
   userInput: string;
   justEdited: boolean;
   entryTone: string;
+  stackVersion: number;
   start: (
     nodeId?: string,
     opts?: { scenario?: string; movementPreset?: string; entryTone?: string }
@@ -109,6 +110,7 @@ export const useSession = create<SessionState>((set, get) => ({
   userInput: "",
   justEdited: false,
   entryTone: "",
+  stackVersion: 0,
   start: (nodeId = DEFAULT_START, opts) => {
     set((state) => ({
       ...state,
@@ -122,6 +124,7 @@ export const useSession = create<SessionState>((set, get) => ({
       userInput: "",
       justEdited: false,
       entryTone: opts?.entryTone ?? "",
+      stackVersion: state.stackVersion + 1,
     }));
 
     navigateToNode(nodeId, set, get, { resetHistory: true });
