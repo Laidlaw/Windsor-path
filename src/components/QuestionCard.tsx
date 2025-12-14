@@ -19,6 +19,8 @@ export function QuestionCard({ node, showEditWarning }: Props) {
   const [to, setTo] = useState<string>("");
   const [showExpectation, setShowExpectation] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showFromMenu, setShowFromMenu] = useState(false);
+  const [showToMenu, setShowToMenu] = useState(false);
 
   useEffect(() => {
     if (node.id !== "movement_type") return;
@@ -57,6 +59,14 @@ export function QuestionCard({ node, showEditWarning }: Props) {
     () => node.options.find((opt) => opt.value === mappedValue),
     [mappedValue, node.options]
   );
+  const unsupported = from !== "" && to !== "" && mappedValue === "";
+  const supportedRoutes = [
+    "Great Britain → Northern Ireland",
+    "Northern Ireland → Great Britain",
+    "Northern Ireland → European Union",
+    "European Union → Northern Ireland",
+    "Rest of World → Northern Ireland",
+  ];
 
   const startMovement = () => {
     if (!mappedOption?.next || !mappedValue) return;
@@ -91,6 +101,28 @@ export function QuestionCard({ node, showEditWarning }: Props) {
     []
   );
 
+  const handleSelectFrom = (code: string) => {
+    setFrom((prevFrom) => {
+      if (code === to) {
+        setTo(prevFrom);
+      }
+      return code;
+    });
+    setShowFromMenu(false);
+    setShowToMenu(false);
+  };
+
+  const handleSelectTo = (code: string) => {
+    setTo((prevTo) => {
+      if (code === from) {
+        setFrom(prevTo);
+      }
+      return code;
+    });
+    setShowFromMenu(false);
+    setShowToMenu(false);
+  };
+
   return (
     <div className="wp-card">
       {showEditWarning && (
@@ -106,56 +138,101 @@ export function QuestionCard({ node, showEditWarning }: Props) {
             for that journey.
           </p> */}
           <div className="wp-flight">
-            <div className="wp-flight__field">
-              <div className="wp-label">From</div>
-              <div className="wp-flight__pills">
-                {fromOptions.map((opt) => (
-                  <button
-                    key={opt.code}
-                    type="button"
-                    className={`wp-flight__pill ${
-                      from === opt.code ? "active" : ""
-                    } ${to === opt.code ? "disabled" : ""}`}
-                    onClick={() => setFrom(opt.code)}
-                    disabled={to === opt.code}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+            <div className="wp-flight__madlib">
+              <span className="wp-flight__text">I'm shipping goods from</span>
+              <div className="wp-flight__inline" aria-label="Select where goods are coming from">
+                <button
+                  type="button"
+                  className="wp-flight__select"
+                  aria-expanded={showFromMenu}
+                  onClick={() => {
+                    setShowFromMenu((open) => !open);
+                    setShowToMenu(false);
+                  }}
+                >
+                  {fromOptions.find((opt) => opt.code === from)?.label ?? "Choose origin"}
+                  <span className="wp-flight__caret">▾</span>
+                </button>
+                {showFromMenu && (
+                  <div className="wp-flight__menu">
+                    {fromOptions.map((opt) => (
+                      <button
+                        key={opt.code}
+                        type="button"
+                        className={`wp-flight__pill ${from === opt.code ? "active" : ""}`}
+                        aria-pressed={from === opt.code}
+                        onClick={() => handleSelectFrom(opt.code)}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <span className="wp-flight__text">to</span>
+              <div className="wp-flight__inline" aria-label="Select where goods are going to">
+                <button
+                  type="button"
+                  className="wp-flight__select"
+                  aria-expanded={showToMenu}
+                  onClick={() => {
+                    setShowToMenu((open) => !open);
+                    setShowFromMenu(false);
+                  }}
+                >
+                  {toOptions.find((opt) => opt.code === to)?.label ?? "Choose destination"}
+                  <span className="wp-flight__caret">▾</span>
+                </button>
+                {showToMenu && (
+                  <div className="wp-flight__menu">
+                    {toOptions.map((opt) => (
+                      <button
+                        key={opt.code}
+                        type="button"
+                        className={`wp-flight__pill ${to === opt.code ? "active" : ""}`}
+                        aria-pressed={to === opt.code}
+                        onClick={() => handleSelectTo(opt.code)}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-            <div className="wp-flight__field">
-              <div className="wp-label">To</div>
-              <div className="wp-flight__pills">
-                {toOptions.map((opt) => (
-                  <button
-                    key={opt.code}
-                    type="button"
-                    className={`wp-flight__pill ${to === opt.code ? "active" : ""} ${
-                      from === opt.code ? "disabled" : ""
-                    }`}
-                    onClick={() => setTo(opt.code)}
-                    disabled={from === opt.code}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+            <div className="wp-flight__actions">
+              <div className="wp-flight__hint">
+                Routes must involve Northern Ireland — we’ll swap the ends automatically if
+                you pick the same place twice.
               </div>
+              <button
+                type="button"
+                className="wp-primary"
+                disabled={!mappedOption?.next}
+                onClick={startMovement}
+              >
+                {unsupported
+                  ? "Route not covered"
+                  : currentMovement
+                  ? "Restart with this route"
+                  : "Start"}
+              </button>
             </div>
-            <button
-              type="button"
-              className="wp-primary"
-              disabled={!mappedOption?.next}
-              onClick={startMovement}
-            >
-              {currentMovement ? "Restart with this route" : "Start"}
-            </button>
           </div>
-          {mappedValue === "" && from && to && (
-            <div className="wp-help">
-              This tool focuses on movements involving Northern Ireland. Try a different
-              combination.
-            </div>
+          {unsupported && (
+            <>
+              <div className="wp-help">
+                This tool only covers movements involving Northern Ireland. Try adjusting your
+                route to or from NI.
+              </div>
+              <div className="wp-chip-row">
+                {supportedRoutes.map((route) => (
+                  <span key={route} className="wp-chip">
+                    {route}
+                  </span>
+                ))}
+              </div>
+            </>
           )}
         </>
       ) : (
