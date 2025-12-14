@@ -45,7 +45,6 @@ export function SummaryPanel({
   const scenarioChosen = Boolean(scenario);
   const percentage = Math.min((complexity / MAX_COMPLEXITY) * 100, 100);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showProvisional, setShowProvisional] = useState(false);
   useEffect(() => {
     // no-op placeholder for potential triggers
   }, []);
