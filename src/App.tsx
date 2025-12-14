@@ -19,17 +19,19 @@ export default function WindsorPathApp() {
         <button className="wp-brand" type="button" onClick={() => reset()}>
           Windsor Path
         </button>
-        <button className="wp-restart hide-mobile" type="button" onClick={() => reset()}>
-          Restart
-        </button>
-        <button
-          className="wp-menu-toggle"
-          type="button"
-          onClick={() => setReportOpen((open) => !open)}
-          aria-label="Open menu"
-        >
-          Menu
-        </button>
+        <div className="wp-topbar__actions">
+          <button className="wp-restart hide-mobile" type="button" onClick={() => reset()}>
+            Restart
+          </button>
+          <button
+            className="wp-menu-toggle"
+            type="button"
+            onClick={() => setReportOpen((open) => !open)}
+            aria-label="Open menu"
+          >
+            <span className="wp-menu-icon" aria-hidden />
+          </button>
+        </div>
       </header>
 
       <div className="wp-layout">
