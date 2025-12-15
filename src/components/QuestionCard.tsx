@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getPreview } from "../flow/FlowEngine";
 import type { QuestionNode } from "../flow/types";
 import { useSession } from "../state/useSession";
+import { calculateRiskProfile } from "../state/riskProfile";
 
 type Props = {
   node: QuestionNode;
@@ -10,7 +11,6 @@ type Props = {
 
 export function QuestionCard({ node, showEditWarning }: Props) {
   const answer = useSession((s) => s.answerSingle);
-  const startFlow = useSession((s) => s.start);
   const currentMovement = useSession((s) => s.answers["movement_type"]) as
     | string
     | undefined;
@@ -19,6 +19,16 @@ export function QuestionCard({ node, showEditWarning }: Props) {
   const [to, setTo] = useState<string>("");
   const [showExpectation, setShowExpectation] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const answers = useSession((s) => s.answers);
+  const viewMode = useSession((s) => s.viewMode);
+  const setViewMode = useSession((s) => s.setViewMode);
+  const riskProfile = useMemo(() => calculateRiskProfile(answers), [answers]);
+  const miniRisk = [
+    { key: "audit", label: "Audit", value: riskProfile.audit },
+    { key: "doc", label: "Docs", value: riskProfile.documentary },
+    { key: "temp", label: "Temporal", value: riskProfile.temporal },
+    { key: "judgment", label: "Judgment", value: riskProfile.judgment },
+  ];
   const [showFromMenu, setShowFromMenu] = useState(false);
   const [showToMenu, setShowToMenu] = useState(false);
 
@@ -131,6 +141,31 @@ export function QuestionCard({ node, showEditWarning }: Props) {
         </div>
       )}
       <h2 className="wp-question">{node.question}</h2>
+      <div className="wp-question-meta">
+        <div className="wp-view-toggle inline" role="group" aria-label="View mode">
+          <button
+            type="button"
+            className={viewMode === "procedural" ? "active" : ""}
+            onClick={() => setViewMode("procedural")}
+          >
+            Procedural
+          </button>
+          <button
+            type="button"
+            className={viewMode === "reality" ? "active" : ""}
+            onClick={() => setViewMode("reality")}
+          >
+            Reality
+          </button>
+        </div>
+        <div className="wp-mini-risk">
+          {miniRisk.map((bar) => (
+            <span key={bar.key}>
+              {bar.label} {Math.round(bar.value)}%
+            </span>
+          ))}
+        </div>
+      </div>
       {node.id === "movement_type" ? (
         <>
           {/* <p className="wp-help">

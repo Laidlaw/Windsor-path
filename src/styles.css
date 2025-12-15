@@ -317,6 +317,23 @@ textarea {
   color: var(--accent-olive-slate);
 }
 
+.wp-question-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.wp-mini-risk {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--muted);
+}
+
 .wp-lede {
   margin: 6px 0 4px;
   font-weight: 600;
