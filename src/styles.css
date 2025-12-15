@@ -1139,6 +1139,13 @@ textarea {
   background: #f9fbff;
 }
 
+.wp-hidden__body {
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
 .wp-hidden__notes {
   margin-top: 12px;
   font-size: 14px;

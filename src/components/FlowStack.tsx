@@ -10,7 +10,7 @@ export function FlowStack() {
   const answers = useSession((s) => s.answers);
   const prevCount = useRef(0);
   const riskProfile = useMemo(() => calculateRiskProfile(answers), [answers]);
-  const [showHidden, setShowHidden] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   const nodes = useMemo(() => {
     return history.map((id) => ({
@@ -42,12 +42,16 @@ export function FlowStack() {
               <button
                 type="button"
                 className="wp-gutter__label"
-                onClick={() => setShowHidden(true)}
+                onClick={() => setShowMore((open) => !open)}
               >
                 Hidden layers
               </button>
               <div className="wp-gutter__controls">
-                <button type="button" className="wp-link ghost small" onClick={() => setShowHidden(true)}>
+                <button
+                  type="button"
+                  className="wp-link ghost small"
+                  onClick={() => setShowMore((open) => !open)}
+                >
                   Tell me more
                 </button>
                 <button
@@ -65,8 +69,8 @@ export function FlowStack() {
           )}
         </Fragment>
       ))}
-      {showHidden && (
-        <div className="wp-modal-backdrop" onClick={() => setShowHidden(false)}>
+      {showMore && (
+        <div className="wp-modal-backdrop" onClick={() => setShowMore(false)}>
           <div
             className="wp-modal"
             role="dialog"
@@ -80,18 +84,19 @@ export function FlowStack() {
                   How audit, documents, time, and judgment pressures stack beneath your choices.
                 </div>
               </div>
-              <button className="wp-link ghost small" type="button" onClick={() => setShowHidden(false)}>
+              <button className="wp-link ghost small" type="button" onClick={() => setShowMore(false)}>
                 Close
               </button>
             </div>
             <div className="wp-hidden__grid">
               <div className="wp-hidden__card">
                 <div className="wp-risk__label-row">
-                  <span>Audit</span>
-                  <span className="wp-risk__value">{Math.round(riskProfile.audit)}%</span>
+                  <span>Temporal uncertainty</span>
+                  <span className="wp-risk__value">{Math.round(riskProfile.temporal)}%</span>
                 </div>
-                <div className="wp-risk__meter">
-                  <div className="wp-risk__fill high" style={{ width: `${Math.round(riskProfile.audit)}%` }} />
+                <div className="wp-hidden__body">
+                  Declarations hinge on future customer behavior. If goods move to EU/Ireland later, earlier
+                  “not at risk” claims become wrong.
                 </div>
               </div>
               <div className="wp-hidden__card">
@@ -99,35 +104,37 @@ export function FlowStack() {
                   <span>Documentary burden</span>
                   <span className="wp-risk__value">{Math.round(riskProfile.documentary)}%</span>
                 </div>
-                <div className="wp-risk__meter">
-                  <div
-                    className="wp-risk__fill moderate"
-                    style={{ width: `${Math.round(riskProfile.documentary)}%` }}
-                  />
+                <div className="wp-hidden__body">
+                  Evidence per shipment: customer declarations, delivery receipts, origin docs, monitoring that
+                  goods stayed in NI/GB. Gaps can convert shipments to “at risk”.
                 </div>
               </div>
               <div className="wp-hidden__card">
                 <div className="wp-risk__label-row">
-                  <span>Temporal uncertainty</span>
-                  <span className="wp-risk__value">{Math.round(riskProfile.temporal)}%</span>
+                  <span>Cost cascade</span>
                 </div>
-                <div className="wp-risk__meter">
-                  <div
-                    className="wp-risk__fill moderate"
-                    style={{ width: `${Math.round(riskProfile.temporal)}%` }}
-                  />
+                <div className="wp-hidden__body">
+                  Reroute 10% to EU: £8k–15k duties + £500–2.5k penalties.<br />
+                  Audit year: extrapolated x5–8 + £15k–40k representation.<br />
+                  Evidence gap: treat year as at-risk: £40k–80k (worst case £150k–280k).
                 </div>
               </div>
               <div className="wp-hidden__card">
                 <div className="wp-risk__label-row">
-                  <span>Judgment calls</span>
-                  <span className="wp-risk__value">{Math.round(riskProfile.judgment)}%</span>
+                  <span>Exclusions</span>
                 </div>
-                <div className="wp-risk__meter">
-                  <div
-                    className="wp-risk__fill high"
-                    style={{ width: `${Math.round(riskProfile.judgment)}%` }}
-                  />
+                <div className="wp-hidden__body">
+                  Green Lane often excluded: mixed loads, unsure destination, &gt;3% tariff differential, many SPS
+                  or third-country goods. Consider Red Lane early.
+                </div>
+              </div>
+              <div className="wp-hidden__card">
+                <div className="wp-risk__label-row">
+                  <span>Practitioner reality</span>
+                </div>
+                <div className="wp-hidden__body">
+                  FSB survey: 34% stopped GB→NI trade; 58% face moderate-significant challenges. Customer
+                  declarations often refused; long-term suppliers step back due to burden.
                 </div>
               </div>
             </div>
