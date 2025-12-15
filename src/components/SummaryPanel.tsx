@@ -17,10 +17,8 @@ export function SummaryPanel({
   const history = useSession((s) => s.history);
   const answers = useSession((s) => s.answers);
   const scenario = useSession((s) => s.scenario);
-  const viewMode = useSession((s) => s.viewMode);
-  const setViewMode = useSession((s) => s.setViewMode);
   const [showProvisional, setShowProvisional] = useState(false);
-  const [showHidden, setShowHidden] = useState(false);
+  const [showRealityNote, setShowRealityNote] = useState(false);
 
   const items = useMemo(() => {
     const seen = new Set<string>();
@@ -41,7 +39,6 @@ export function SummaryPanel({
 
   const scenarioLabel = scenario ? getScenarioLabel(scenario) : "";
   const riskProfile = useMemo(() => calculateRiskProfile(answers), [answers]);
-  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     // no-op placeholder for potential triggers
   }, []);
@@ -87,34 +84,23 @@ export function SummaryPanel({
     { key: "judgment", label: "Judgment calls", value: riskProfile.judgment },
   ];
 
+  const toneForId = (id: string) => {
+    const order = ["movement_type", "sector_gate", "ukims_auth", "turnover_check", "goods_purpose", "approved_purpose_check", "evidence_check"];
+    const idx = order.indexOf(id);
+    if (idx === -1) return "pill-neutral";
+    if (idx <= 1) return "pill-low";
+    if (idx <= 4) return "pill-medium";
+    return "pill-high";
+  };
+
   return (
     <>
       <aside className={`wp-summary ${reportOpen ? "open" : ""}`}>
         <div className="wp-summary__header">
-          <div>
-            <div className="wp-summary__title">Your report</div>
-            <div className="wp-summary__hint">
-              Live risk view updates as you answer. The log below tracks your decisions.
+          <div className="wp-summary__title-row">
+            <div>
+              <div className="wp-summary__title">Your report</div>
             </div>
-          </div>
-          <div className="wp-summary__top-actions">
-            <div className="wp-view-toggle" role="group" aria-label="Report view mode">
-              <button
-                type="button"
-                className={viewMode === "procedural" ? "active" : ""}
-                onClick={() => setViewMode("procedural")}
-              >
-                Procedural
-              </button>
-              <button
-                type="button"
-                className={viewMode === "reality" ? "active" : ""}
-                onClick={() => setViewMode("reality")}
-              >
-                Reality
-              </button>
-            </div>
-            <div className={`wp-summary__status ${tone}`}>{status}</div>
           </div>
         </div>
 
@@ -124,45 +110,6 @@ export function SummaryPanel({
               <div className="wp-risk__label">Risk profile</div>
               <div className={`wp-risk__pill ${tone}`}>
                 {tone === "high" ? "High" : tone === "moderate" ? "Moderate" : "Lower"} exposure
-              </div>
-              <button
-                type="button"
-                className="wp-link ghost small"
-                onClick={() => setShowHidden(true)}
-              >
-                Hidden layers
-              </button>
-              <div className="wp-summary__actions">
-                <button
-                  type="button"
-                  className="wp-link ghost small"
-                  onClick={() => setMenuOpen((v) => !v)}
-                  aria-label="Report actions"
-                >
-                  ▾
-                </button>
-                {menuOpen && (
-                  <div className="wp-summary__menu">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const text = reportItems
-                          .map((row) => `${row.label}: ${row.value}`)
-                          .join("\n");
-                        navigator.clipboard?.writeText(text);
-                        setMenuOpen(false);
-                      }}
-                    >
-                      Copy report
-                    </button>
-                    <button type="button" onClick={() => setMenuOpen(false)}>
-                      Download (soon)
-                    </button>
-                    <button type="button" onClick={() => setMenuOpen(false)}>
-                      Email (soon)
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
             <div className="wp-risk__bars">
@@ -183,10 +130,22 @@ export function SummaryPanel({
               ))}
             </div>
             <div className="wp-risk__viewcopy">
-              {viewMode === "procedural"
-                ? "Procedural view: focus on obligations and next steps for this path."
-                : "Reality view: highlights uncertainty, cascading costs, and audit exposure."}
+              Reality checks show where costs and uncertainty can spike.
+              <button
+                type="button"
+                className="wp-link ghost small"
+                onClick={() => setShowRealityNote((o) => !o)}
+              >
+                {showRealityNote ? "Hide reality check" : "Show reality check"}
+              </button>
             </div>
+            {showRealityNote && (
+              <div className="wp-reality-note">
+                - Temporal uncertainty: declarations hinge on future customer behavior.<br />
+                - Documentary burden: evidence gaps can retroactively convert shipments to \"at risk\".<br />
+                - Cascading cost: reroutes + audits multiply duties, penalties, and representation costs.
+              </div>
+            )}
           </div>
 
           {reportOpen && (
@@ -224,8 +183,10 @@ export function SummaryPanel({
                     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
                 >
-                  <div className="wp-summary__label">{row.label}</div>
-                  <div className="wp-summary__value">{highlightTerms(row.value)}</div>
+                  <div className="wp-summary__value">
+                    <span className={`wp-chip-pill ${toneForId(row.id)}`}>{row.label}</span>{" "}
+                    {highlightTerms(row.value)}
+                  </div>
                 </button>
               ))}
             </div>
@@ -237,13 +198,13 @@ export function SummaryPanel({
         </div>
       </aside>
 
-      <div className={`wp-provisional ${reportOpen ? "open" : ""}`}>
+      <div id="wp-provisional" className={`wp-provisional ${reportOpen ? "open" : ""}`}>
         <div>
-          <div className="wp-summary__label">Too long?</div>
+          {/* <div className="wp-summary__label">Too long?</div>
           <div className="wp-summary__value">
             Get a quick risk guess based on what you’ve answered so far. You can come
             back and finish any time.
-          </div>
+          </div> */}
         </div>
         {!showProvisional ? (
           <button
@@ -277,55 +238,6 @@ export function SummaryPanel({
         )}
       </div>
 
-      {showHidden && (
-        <div className="wp-modal-backdrop" onClick={() => setShowHidden(false)}>
-          <div
-            className="wp-modal"
-            role="dialog"
-            aria-label="Hidden layers"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="wp-modal__header">
-              <div>
-                <div className="wp-summary__label">Hidden layers</div>
-                <div className="wp-summary__value">
-                  How audit risk, time, and judgment stack beneath your selections.
-                </div>
-              </div>
-              <button className="wp-link ghost small" type="button" onClick={() => setShowHidden(false)}>
-                Close
-              </button>
-            </div>
-            <div className="wp-hidden__grid">
-              {riskBars.map((bar) => (
-                <div key={bar.key} className="wp-hidden__card">
-                  <div className="wp-risk__label-row">
-                    <span>{bar.label}</span>
-                    <span className="wp-risk__value">{Math.round(bar.value)}%</span>
-                  </div>
-                  <div className="wp-risk__meter">
-                    <div
-                      className={`wp-risk__fill ${tone}`}
-                      style={{ width: `${Math.round(bar.value)}%` }}
-                      aria-hidden
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-            {riskProfile.notes.length > 0 && (
-              <div className="wp-hidden__notes">
-                <div className="wp-summary__label">Why these moved</div>
-                <ul>
-                  {riskProfile.notes.map((note, idx) => (
-                    <li key={`${note}-${idx}`}>{note}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </>
   );
 }

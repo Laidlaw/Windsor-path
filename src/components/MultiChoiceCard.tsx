@@ -57,7 +57,7 @@ export function MultiChoiceCard({ node, showEditWarning }: Props) {
       <div className="wp-actions">
         <button
           type="button"
-          className="wp-primary"
+          className="wp-go"
           onClick={() => submit(node.id, selected)}
         >
           Continue

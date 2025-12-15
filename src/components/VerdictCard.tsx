@@ -18,7 +18,7 @@ export function VerdictCard({ node }: Props) {
       <div className="wp-actions">
         <button
           type="button"
-          className="wp-primary"
+          className="wp-go"
           onClick={() => advance(assessment)}
         >
           Continue

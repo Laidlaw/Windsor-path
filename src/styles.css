@@ -334,6 +334,33 @@ textarea {
   color: var(--muted);
 }
 
+.wp-caution {
+  border: 1px solid #ffe6b5;
+  background: #fff8f2;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 8px 0;
+}
+
+.wp-caution__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.wp-caution__title {
+  font-weight: 700;
+  color: #8c5a14;
+}
+
+.wp-caution__body {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
 .wp-lede {
   margin: 6px 0 4px;
   font-weight: 600;
@@ -414,6 +441,36 @@ textarea {
 .wp-flight__select:hover {
   border-color: var(--accent);
   box-shadow: 0 10px 18px rgba(47, 111, 237, 0.15);
+}
+
+.wp-flight__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.wp-go {
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+  background: #f9fef9;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wp-go:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.wp-go:not(:disabled):hover {
+  box-shadow: 0 8px 16px rgba(12, 20, 38, 0.08);
 }
 
 .wp-flight__caret {
@@ -691,6 +748,13 @@ textarea {
   gap: 10px;
 }
 
+.wp-summary__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .wp-summary__title {
   font-weight: 800;
   margin: 0;
@@ -718,13 +782,6 @@ textarea {
   gap: 12px;
   overflow: auto;
   padding-right: 4px;
-}
-
-.wp-summary__top-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-end;
 }
 
 .wp-summary__status.simple {
@@ -778,58 +835,6 @@ textarea {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 12px;
-}
-
-.wp-summary__actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.wp-view-toggle {
-  display: inline-flex;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.wp-view-toggle button {
-  border: none;
-  background: #f7f9fd;
-  padding: 6px 10px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.wp-view-toggle button.active {
-  background: #ffffff;
-  color: var(--ink);
-  box-shadow: inset 0 -2px 0 var(--accent);
-}
-
-.wp-summary__menu {
-  position: absolute;
-  margin-top: 6px;
-  right: 0;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: 0 14px 28px rgba(12, 20, 38, 0.12);
-  display: grid;
-  min-width: 160px;
-  z-index: 5;
-}
-
-.wp-summary__menu button {
-  background: none;
-  border: none;
-  padding: 10px 12px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.wp-summary__menu button:hover {
-  background: #f7f9fd;
 }
 
 .wp-risk-widget {
@@ -934,6 +939,17 @@ textarea {
   margin-top: 6px;
 }
 
+.wp-reality-note {
+  font-size: 13px;
+  color: var(--ink);
+  background: #fff8f2;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
 .wp-report {
   display: flex;
   flex-direction: column;
@@ -957,6 +973,36 @@ textarea {
   border-color: var(--accent);
 }
 
+.wp-chip-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.wp-chip-pill.pill-low {
+  background: #e8f8ef;
+  color: #1f5f3b;
+}
+
+.wp-chip-pill.pill-medium {
+  background: #fff4e5;
+  color: #8c5a14;
+}
+
+.wp-chip-pill.pill-high {
+  background: #ffe6e4;
+  color: #a8231d;
+}
+
+.wp-chip-pill.pill-neutral {
+  background: #eef1f7;
+  color: var(--muted);
+}
+
 .wp-gutter {
   margin: 8px 0 16px;
   padding: 10px 12px;
@@ -971,11 +1017,24 @@ textarea {
 }
 
 .wp-gutter__label {
-  font-weight: 700;
-  color: var(--ink);
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 13px;
 }
 
 .wp-gutter__mini {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.wp-gutter__controls {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;

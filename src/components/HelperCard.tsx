@@ -51,7 +51,7 @@ export function HelperCard({ node, showEditWarning }: Props) {
           <div className="wp-actions">
             <button
               type="button"
-              className="wp-primary"
+              className="wp-go"
               onClick={() => text.trim() && submitText(node.id, text.trim())}
             >
               Continue

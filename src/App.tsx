@@ -7,11 +7,19 @@ import "./styles.css";
 export default function WindsorPathApp() {
   const start = useSession((s) => s.start);
   const reset = useSession((s) => s.reset);
+  const history = useSession((s) => s.history);
+  const goBackTo = useSession((s) => s.goBackTo);
   const [reportOpen, setReportOpen] = useState(false);
 
   useEffect(() => {
     start();
   }, [start]);
+
+  const canStepBack = history.length > 1;
+  const handleStepBack = () => {
+    const prevId = history[history.length - 2];
+    if (prevId) goBackTo(prevId);
+  };
 
   return (
     <div className="wp-shell">
@@ -23,6 +31,11 @@ export default function WindsorPathApp() {
           <button className="wp-restart hide-mobile" type="button" onClick={() => reset()}>
             Restart
           </button>
+          {canStepBack && (
+            <button className="wp-restart hide-mobile" type="button" onClick={handleStepBack}>
+              &lt; Step Back
+            </button>
+          )}
           <button
             className="wp-menu-toggle"
             type="button"

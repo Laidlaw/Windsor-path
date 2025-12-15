@@ -27,7 +27,6 @@ type SessionState = {
   justEdited: boolean;
   entryTone: string;
   stackVersion: number;
-  viewMode: "procedural" | "reality";
   start: (
     nodeId?: string,
     opts?: { scenario?: string; movementPreset?: string; entryTone?: string }
@@ -42,7 +41,6 @@ type SessionState = {
   reset: () => void;
   getNode: (id: string) => FlowNode;
   evaluateVerdict: (nodeId: string) => VerdictAssessment | null;
-  setViewMode: (mode: "procedural" | "reality") => void;
 };
 
 type MoveOpts = {
@@ -112,7 +110,6 @@ export const useSession = create<SessionState>((set, get) => ({
   userInput: "",
   justEdited: false,
   entryTone: "",
-  viewMode: "procedural",
   stackVersion: 0,
   start: (nodeId = DEFAULT_START, opts) => {
     set((state) => ({
@@ -127,7 +124,6 @@ export const useSession = create<SessionState>((set, get) => ({
       userInput: "",
       justEdited: false,
       entryTone: opts?.entryTone ?? "",
-      viewMode: "procedural",
       stackVersion: state.stackVersion + 1,
     }));
 
@@ -285,9 +281,8 @@ export const useSession = create<SessionState>((set, get) => ({
       scenario: null,
       complexity: 0,
       userInput: "",
-      justEdited: false,
-      entryTone: "",
-      viewMode: "procedural",
+  justEdited: false,
+  entryTone: "",
     }));
     navigateToNode(DEFAULT_START, set, get, { resetHistory: true });
   },
@@ -298,9 +293,4 @@ export const useSession = create<SessionState>((set, get) => ({
     const userInput = get().userInput;
     return evaluateVerdict(node, get().history, userInput);
   },
-  setViewMode: (mode) =>
-    set((state) => ({
-      ...state,
-      viewMode: mode,
-    })),
 }));

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { getPreview } from "../flow/FlowEngine";
 import type { QuestionNode } from "../flow/types";
 import { useSession } from "../state/useSession";
-import { calculateRiskProfile } from "../state/riskProfile";
 
 type Props = {
   node: QuestionNode;
@@ -19,16 +18,32 @@ export function QuestionCard({ node, showEditWarning }: Props) {
   const [to, setTo] = useState<string>("");
   const [showExpectation, setShowExpectation] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const answers = useSession((s) => s.answers);
-  const viewMode = useSession((s) => s.viewMode);
-  const setViewMode = useSession((s) => s.setViewMode);
-  const riskProfile = useMemo(() => calculateRiskProfile(answers), [answers]);
-  const miniRisk = [
-    { key: "audit", label: "Audit", value: riskProfile.audit },
-    { key: "doc", label: "Docs", value: riskProfile.documentary },
-    { key: "temp", label: "Temporal", value: riskProfile.temporal },
-    { key: "judgment", label: "Judgment", value: riskProfile.judgment },
-  ];
+  const [showCaution, setShowCaution] = useState(false);
+
+  const caution = useMemo(() => {
+    if (node.id === "goods_purpose") {
+      return {
+        title: "Temporal uncertainty",
+        body:
+          "“Not at risk” relies on predicting where customers use or resell goods over 6–24 months. If they reroute to EU/Ireland, declarations become retroactively wrong.",
+      };
+    }
+    if (node.id === "approved_purpose_check") {
+      return {
+        title: "Judgment required",
+        body:
+          "Approved purposes are fact-specific. Tools can’t verify if processing is truly non-commercial or if customers meet the UK end-consumer test.",
+      };
+    }
+    if (node.id === "evidence_check") {
+      return {
+        title: "Evidence burden",
+        body:
+          "Sustained proof is needed: customer declarations, delivery receipts, origin docs, and monitoring that goods stayed in NI/GB. Gaps can convert shipments to “at risk.”",
+      };
+    }
+    return null;
+  }, [node.id]);
   const [showFromMenu, setShowFromMenu] = useState(false);
   const [showToMenu, setShowToMenu] = useState(false);
 
@@ -141,31 +156,6 @@ export function QuestionCard({ node, showEditWarning }: Props) {
         </div>
       )}
       <h2 className="wp-question">{node.question}</h2>
-      <div className="wp-question-meta">
-        <div className="wp-view-toggle inline" role="group" aria-label="View mode">
-          <button
-            type="button"
-            className={viewMode === "procedural" ? "active" : ""}
-            onClick={() => setViewMode("procedural")}
-          >
-            Procedural
-          </button>
-          <button
-            type="button"
-            className={viewMode === "reality" ? "active" : ""}
-            onClick={() => setViewMode("reality")}
-          >
-            Reality
-          </button>
-        </div>
-        <div className="wp-mini-risk">
-          {miniRisk.map((bar) => (
-            <span key={bar.key}>
-              {bar.label} {Math.round(bar.value)}%
-            </span>
-          ))}
-        </div>
-      </div>
       {node.id === "movement_type" ? (
         <>
           {/* <p className="wp-help">
@@ -173,85 +163,84 @@ export function QuestionCard({ node, showEditWarning }: Props) {
             for that journey.
           </p> */}
           <div className="wp-flight">
-            <div className="wp-flight__madlib">
-              <span className="wp-flight__text">I'm shipping goods from</span>
-              <div className="wp-flight__inline" aria-label="Select where goods are coming from">
-                <button
-                  type="button"
-                  className="wp-flight__select"
-                  aria-expanded={showFromMenu}
-                  onClick={() => {
-                    setShowFromMenu((open) => !open);
-                    setShowToMenu(false);
-                  }}
-                >
-                  {fromOptions.find((opt) => opt.code === from)?.label ?? "Choose origin"}
-                  <span className="wp-flight__caret">▾</span>
-                </button>
-                {showFromMenu && (
-                  <div className="wp-flight__menu">
-                    {fromOptions.map((opt) => (
-                      <button
-                        key={opt.code}
-                        type="button"
-                        className={`wp-flight__pill ${from === opt.code ? "active" : ""}`}
-                        aria-pressed={from === opt.code}
-                        onClick={() => handleSelectFrom(opt.code)}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <span className="wp-flight__text">to</span>
-              <div className="wp-flight__inline" aria-label="Select where goods are going to">
-                <button
-                  type="button"
-                  className="wp-flight__select"
-                  aria-expanded={showToMenu}
-                  onClick={() => {
-                    setShowToMenu((open) => !open);
-                    setShowFromMenu(false);
-                  }}
-                >
-                  {toOptions.find((opt) => opt.code === to)?.label ?? "Choose destination"}
-                  <span className="wp-flight__caret">▾</span>
-                </button>
-                {showToMenu && (
-                  <div className="wp-flight__menu">
-                    {toOptions.map((opt) => (
-                      <button
-                        key={opt.code}
-                        type="button"
-                        className={`wp-flight__pill ${to === opt.code ? "active" : ""}`}
-                        aria-pressed={to === opt.code}
-                        onClick={() => handleSelectTo(opt.code)}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="wp-flight__actions">
-              <div className="wp-flight__hint">
-                Routes must involve Northern Ireland — we’ll swap the ends automatically if
-                you pick the same place twice.
+            <div className="wp-flight__row">
+              <div className="wp-flight__madlib">
+                <span className="wp-flight__text">I'm shipping goods from</span>
+                <div className="wp-flight__inline" aria-label="Select where goods are coming from">
+                  <button
+                    type="button"
+                    className="wp-flight__select"
+                    aria-expanded={showFromMenu}
+                    onClick={() => {
+                      setShowFromMenu((open) => !open);
+                      setShowToMenu(false);
+                    }}
+                  >
+                    {fromOptions.find((opt) => opt.code === from)?.label ?? "Choose origin"}
+                    <span className="wp-flight__caret">▾</span>
+                  </button>
+                  {showFromMenu && (
+                    <div className="wp-flight__menu">
+                      {fromOptions.map((opt) => (
+                        <button
+                          key={opt.code}
+                          type="button"
+                          className={`wp-flight__pill ${from === opt.code ? "active" : ""}`}
+                          aria-pressed={from === opt.code}
+                          onClick={() => handleSelectFrom(opt.code)}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <span className="wp-flight__text">to</span>
+                <div className="wp-flight__inline" aria-label="Select where goods are going to">
+                  <button
+                    type="button"
+                    className="wp-flight__select"
+                    aria-expanded={showToMenu}
+                    onClick={() => {
+                      setShowToMenu((open) => !open);
+                      setShowFromMenu(false);
+                    }}
+                  >
+                    {toOptions.find((opt) => opt.code === to)?.label ?? "Choose destination"}
+                    <span className="wp-flight__caret">▾</span>
+                  </button>
+                  {showToMenu && (
+                    <div className="wp-flight__menu">
+                      {toOptions.map((opt) => (
+                        <button
+                          key={opt.code}
+                          type="button"
+                          className={`wp-flight__pill ${to === opt.code ? "active" : ""}`}
+                          aria-pressed={to === opt.code}
+                          onClick={() => handleSelectTo(opt.code)}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               <button
                 type="button"
-                className="wp-primary"
+                className="wp-go"
                 disabled={!mappedOption?.next}
                 onClick={startMovement}
               >
                 {unsupported
-                  ? "Route not covered"
+                  ? "Not covered"
                   : currentMovement
-                  ? "Restart with this route"
-                  : "Start"}
+                  ? "Go"
+                  : "Go"}
               </button>
+            </div>
+            <div className="wp-flight__hint">
+              Routes must involve Northern Ireland — we’ll swap the ends automatically if you pick the same place twice.
             </div>
           </div>
           {unsupported && (
@@ -272,6 +261,21 @@ export function QuestionCard({ node, showEditWarning }: Props) {
         </>
       ) : (
         node.help && <p className="wp-help">{node.help}</p>
+      )}
+      {caution && (
+        <div className="wp-caution">
+          <div className="wp-caution__header">
+            <span className="wp-caution__title">{caution.title}</span>
+            <button
+              type="button"
+              className="wp-link ghost small"
+              onClick={() => setShowCaution((open) => !open)}
+            >
+              {showCaution ? "Hide" : "Reality check"}
+            </button>
+          </div>
+          {showCaution && <div className="wp-caution__body">{caution.body}</div>}
+        </div>
       )}
 
       {node.id !== "movement_type" && (

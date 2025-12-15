@@ -1,6 +1,7 @@
 import type { ResultNode } from "../flow/types";
 import { useSession } from "../state/useSession";
 import { calculateRiskProfile } from "../state/riskProfile";
+import { useState } from "react";
 
 type Props = {
   node: ResultNode;
@@ -24,8 +25,8 @@ const priorityCopy: Record<string, string> = {
 export function ResultView({ node, entryTone }: Props) {
   const goBack = useSession((s) => s.goBackFromResult);
   const answers = useSession((s) => s.answers);
-  const viewMode = useSession((s) => s.viewMode);
   const riskProfile = calculateRiskProfile(answers);
+  const [cascadeOpen, setCascadeOpen] = useState(false);
 
   const cascade = {
     baseline: "Assuming everything goes to plan: £0–£300 per consignment (admin + broker)",
@@ -148,38 +149,47 @@ export function ResultView({ node, entryTone }: Props) {
 
       <section className="wp-section wp-section--cascade">
         <div className="wp-section__title">
-          {viewMode === "reality" ? "What could go wrong" : "Reality check (tap to expand)"}
+          What could go wrong
+          <button
+            type="button"
+            className="wp-link ghost small"
+            onClick={() => setCascadeOpen((o) => !o)}
+          >
+            {cascadeOpen ? "Hide" : "Show"}
+          </button>
         </div>
-        <div className={`wp-cascade ${viewMode === "reality" ? "open" : ""}`}>
-          <div className="wp-cascade__row">
-            <div className="wp-cascade__label">Baseline</div>
-            <div className="wp-cascade__value">{cascade.baseline}</div>
-          </div>
-          <div className="wp-cascade__row">
-            <div className="wp-cascade__label">Reroute scenario</div>
-            <div className="wp-cascade__value">{cascade.reroute}</div>
-          </div>
-          <div className="wp-cascade__row">
-            <div className="wp-cascade__label">Audit year</div>
-            <div className="wp-cascade__value">{cascade.audit}</div>
-          </div>
-          <div className="wp-cascade__row">
-            <div className="wp-cascade__label">Evidence gap</div>
-            <div className="wp-cascade__value">{cascade.docs}</div>
-          </div>
-          <div className="wp-cascade__meta">
-            <div className="wp-risk__label-row">
-              <span>Exposure drivers</span>
-              <span className="wp-risk__value">{Math.round(riskProfile.overall)}%</span>
+        {cascadeOpen && (
+          <div className="wp-cascade open">
+            <div className="wp-cascade__row">
+              <div className="wp-cascade__label">Baseline</div>
+              <div className="wp-cascade__value">{cascade.baseline}</div>
             </div>
-            <div className="wp-cascade__chips">
-              <span>Audit {Math.round(riskProfile.audit)}%</span>
-              <span>Docs {Math.round(riskProfile.documentary)}%</span>
-              <span>Temporal {Math.round(riskProfile.temporal)}%</span>
-              <span>Judgment {Math.round(riskProfile.judgment)}%</span>
+            <div className="wp-cascade__row">
+              <div className="wp-cascade__label">Reroute scenario</div>
+              <div className="wp-cascade__value">{cascade.reroute}</div>
+            </div>
+            <div className="wp-cascade__row">
+              <div className="wp-cascade__label">Audit year</div>
+              <div className="wp-cascade__value">{cascade.audit}</div>
+            </div>
+            <div className="wp-cascade__row">
+              <div className="wp-cascade__label">Evidence gap</div>
+              <div className="wp-cascade__value">{cascade.docs}</div>
+            </div>
+            <div className="wp-cascade__meta">
+              <div className="wp-risk__label-row">
+                <span>Exposure drivers</span>
+                <span className="wp-risk__value">{Math.round(riskProfile.overall)}%</span>
+              </div>
+              <div className="wp-cascade__chips">
+                <span>Audit {Math.round(riskProfile.audit)}%</span>
+                <span>Docs {Math.round(riskProfile.documentary)}%</span>
+                <span>Temporal {Math.round(riskProfile.temporal)}%</span>
+                <span>Judgment {Math.round(riskProfile.judgment)}%</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </section>
 
       <div className="wp-actions solo">
