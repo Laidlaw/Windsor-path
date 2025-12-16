@@ -23,39 +23,42 @@ export default function WindsorPathApp() {
 
   return (
     <div className="wp-shell">
-      <header className="wp-topbar">
-        <button className="wp-brand" type="button" onClick={() => reset()}>
-          Windsor Path
-        </button>
-        <div className="wp-topbar__actions">
-          <button className="wp-restart hide-mobile" type="button" onClick={() => reset()}>
-            Restart
-          </button>
-          {canStepBack && (
-            <button className="wp-restart hide-mobile" type="button" onClick={handleStepBack}>
-              &lt; Step Back
-            </button>
-          )}
-          <button
-            className="wp-menu-toggle"
-            type="button"
-            onClick={() => setReportOpen((open) => !open)}
-            aria-label="Open menu"
-          >
-            <span className="wp-menu-icon" aria-hidden />
-          </button>
-        </div>
-      </header>
-
       <div className="wp-layout">
-        <div className="wp-main">
-          <FlowStack />
+        <div className="wp-survey">
+          <header className="wp-topbar">
+            <button className="wp-brand" type="button" onClick={() => reset()}>
+              Windsor Path
+            </button>
+            <div className="wp-topbar__actions">
+              <button className="wp-restart hide-mobile" type="button" onClick={() => reset()}>
+                Restart
+              </button>
+              {canStepBack && (
+                <button className="wp-restart hide-mobile" type="button" onClick={handleStepBack}>
+                  &lt; Step Back
+                </button>
+              )}
+              <button
+                className="wp-menu-toggle"
+                type="button"
+                onClick={() => setReportOpen((open) => !open)}
+                aria-label="Open menu"
+              >
+                <span className="wp-menu-icon" aria-hidden />
+              </button>
+            </div>
+          </header>
+          <div className="wp-main">
+            <FlowStack />
+          </div>
         </div>
-        <SummaryPanel
-          reportOpen={reportOpen}
-          onCloseReport={() => setReportOpen(false)}
-          onRestart={() => reset()}
-        />
+        <div className="wp-summary-col">
+          <SummaryPanel
+            reportOpen={reportOpen}
+            onCloseReport={() => setReportOpen(false)}
+            onRestart={() => reset()}
+          />
+        </div>
       </div>
 
       <footer className="wp-disclaimer">

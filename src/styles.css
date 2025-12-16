@@ -74,6 +74,7 @@ textarea {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: 0 12px 26px rgba(12, 20, 38, 0.06);
+  width: 100%;
 }
 
 .wp-brand {
@@ -157,6 +158,10 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+.wp-top-grid {
+  display: none;
 }
 
 .wp-hero {
@@ -291,6 +296,17 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.wp-survey {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wp-summary-col {
+  position: sticky;
+  top: 16px;
 }
 
 .wp-stack-questions {
@@ -727,7 +743,7 @@ textarea {
 
 .wp-summary {
   position: sticky;
-  top: 68px;
+  top: 28px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
